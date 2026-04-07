@@ -1,0 +1,361 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#2d6a4f;--green-light:#52b788;--green-pale:#d8f3dc;
+  --stone:#6b6052;--stone-light:#a89880;--stone-pale:#f0ebe3;
+  --amber:#b5832a;--amber-pale:#fdf3dc;
+  --sky:#1a6a8a;--sky-pale:#e0f4ff;
+  --cream:#faf8f2;--text:#2c2416;--muted:#7a6a54;--border:#d4c9b8;
+}
+body{font-family:var(--font-sans,system-ui,sans-serif);background:var(--cream);color:var(--text)}
+.screen{display:none;flex-direction:column;align-items:center;padding:1.5rem 1rem 2rem;min-height:520px;gap:1rem}
+.screen.active{display:flex}
+.scene-header{width:100%;text-align:center;position:relative;overflow:hidden;border-radius:16px;padding:1.5rem 1rem 1rem;margin-bottom:.25rem}
+.forest-bg{position:absolute;inset:0;z-index:0}
+.scene-header h1{position:relative;z-index:1;font-size:26px;font-weight:500;letter-spacing:-.5px}
+.scene-header p{position:relative;z-index:1;font-size:13px;color:var(--muted);margin-top:3px}
+.animal-row{display:flex;justify-content:center;gap:12px;margin:0 0 .5rem}
+.animal{font-size:28px;animation:sway 3s ease-in-out infinite}
+.animal:nth-child(2){animation-delay:.5s}
+.animal:nth-child(3){animation-delay:1s}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.divider{display:flex;align-items:center;gap:8px;width:100%}
+.divider-line{flex:1;height:.5px;background:var(--border)}
+.divider span{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.input-wrap{width:100%;max-width:320px;display:flex;flex-direction:column;gap:5px}
+.input-wrap label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.input-wrap input{width:100%;padding:10px 14px;border-radius:10px;border:.5px solid var(--border);font-size:15px;background:#fff;color:var(--text);outline:none;transition:border-color .2s}
+.input-wrap input:focus{border-color:var(--green-light)}
+.btn-main{padding:12px 36px;border-radius:10px;background:var(--green);color:#fff;font-size:15px;font-weight:500;border:none;cursor:pointer;transition:opacity .15s,transform .1s}
+.btn-main:hover{opacity:.88}
+.btn-main:active{transform:scale(.97)}
+.btn-ghost{padding:10px 24px;border-radius:10px;background:transparent;color:var(--muted);font-size:14px;border:.5px solid var(--border);cursor:pointer;transition:background .15s}
+.btn-ghost:hover{background:var(--stone-pale)}
+.scores{display:flex;gap:10px;width:100%;max-width:400px}
+.score-card{flex:1;background:#fff;border:.5px solid var(--border);border-radius:12px;padding:.875rem 1rem;text-align:center}
+.score-name{font-size:11px;color:var(--muted);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score-num{font-size:30px;font-weight:500;color:var(--green)}
+.vs{font-size:11px;color:var(--muted);display:flex;align-items:center;font-style:italic}
+.menu-btns{display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px}
+.back{font-size:13px;color:var(--muted);cursor:pointer;align-self:flex-start;padding:2px 0}
+.back:hover{color:var(--text)}
+.player-section{width:100%;max-width:400px}
+.player-label{font-size:12px;color:var(--muted);margin-bottom:10px}
+.player-name{font-weight:500;color:var(--text)}
+.choices{display:flex;gap:8px;width:100%}
+.choice-btn{flex:1;padding:.875rem .5rem;border-radius:12px;border:.5px solid var(--border);background:#fff;cursor:pointer;text-align:center;transition:border-color .15s,background .15s,transform .1s;display:flex;flex-direction:column;align-items:center;gap:6px}
+.choice-btn:hover{background:var(--stone-pale);border-color:var(--stone-light);transform:translateY(-2px)}
+.choice-btn.selected{border:1.5px solid var(--green);background:var(--green-pale)}
+.choice-btn.disabled{opacity:.35;pointer-events:none}
+.choice-animal{font-size:36px;line-height:1;margin-bottom:2px}
+.choice-label{font-size:11px;color:var(--muted);letter-spacing:.5px}
+.step-dots{display:flex;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:background .3s}
+.dot.active{background:var(--green)}
+.result-card{width:100%;max-width:400px;background:#fff;border:.5px solid var(--border);border-radius:14px;padding:1.25rem}
+.result-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.result-player{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.result-animal{font-size:40px;line-height:1;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.result-pname{font-size:11px;color:var(--muted)}
+.result-move{font-size:12px;color:var(--stone-light)}
+.result-divider{border-top:.5px solid var(--border);margin-top:1rem;padding-top:1rem;text-align:center}
+.result-winner{font-size:16px;font-weight:500;color:var(--text)}
+.result-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.result-btns{display:flex;gap:8px;margin-top:.75rem;justify-content:center}
+.rules-list{width:100%;max-width:340px}
+.rule-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:.5px solid var(--border);font-size:14px;color:var(--muted)}
+.rule-row:last-child{border-bottom:none}
+.rule-animals{font-size:22px;display:flex;align-items:center;gap:2px;min-width:60px}
+.confetti{position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;z-index:999;display:none}
+.leaf{position:absolute;animation:fall linear forwards}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.nature-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);background:var(--stone-pale);border-radius:20px;padding:4px 12px;border:.5px solid var(--border)}
+.hidden-tag{font-size:12px;color:var(--muted);margin-bottom:8px;background:var(--amber-pale);border:.5px solid #e6c97c;border-radius:8px;padding:6px 12px;text-align:center}
+</style>
+
+<div id="confetti" class="confetti"></div>
+
+<div id="s-names" class="screen active">
+  <div class="scene-header" style="background:linear-gradient(160deg,#e8f5e9 0%,#f0f4e8 100%)">
+    <svg class="forest-bg" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax meet" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="60" cy="140" rx="55" ry="70" fill="#a5d6a7" opacity=".35"/>
+      <ellipse cx="200" cy="130" rx="70" ry="90" fill="#81c784" opacity=".3"/>
+      <ellipse cx="340" cy="145" rx="50" ry="65" fill="#a5d6a7" opacity=".35"/>
+      <ellipse cx="120" cy="150" rx="40" ry="55" fill="#c8e6c9" opacity=".25"/>
+      <ellipse cx="280" cy="155" rx="45" ry="60" fill="#c8e6c9" opacity=".25"/>
+      <rect x="57" y="120" width="6" height="40" rx="3" fill="#6a8f6a" opacity=".3"/>
+      <rect x="197" y="110" width="6" height="50" rx="3" fill="#6a8f6a" opacity=".3"/>
+      <rect x="337" y="125" width="6" height="45" rx="3" fill="#6a8f6a" opacity=".3"/>
+    </svg>
+    <div style="position:relative;z-index:1">
+      <div class="animal-row" style="font-size:32px;margin-bottom:.5rem">🦊 🐻 🦝</div>
+      <h1 style="color:#1b5e20">Jokenpô</h1>
+      <p style="color:#388e3c">pedra · papel · tesoura · da floresta</p>
+    </div>
+  </div>
+  <div class="divider"><div class="divider-line"></div><span>quem vai jogar?</span><div class="divider-line"></div></div>
+  <div class="input-wrap">
+    <label>🦊 jogador 1</label>
+    <input type="text" id="n1" placeholder="seu nome..." autocomplete="off" maxlength="20"/>
+  </div>
+  <div class="input-wrap">
+    <label>🐻 jogador 2</label>
+    <input type="text" id="n2" placeholder="seu nome..." autocomplete="off" maxlength="20"/>
+  </div>
+  <button class="btn-main" onclick="startGame()">entrar na floresta 🌿</button>
+  <div class="nature-tag">🌿 natureza & equilíbrio</div>
+</div>
+
+<div id="s-menu" class="screen">
+  <div class="scene-header" style="background:linear-gradient(160deg,#e8f5e9 0%,#f0f4e8 100%)">
+    <svg class="forest-bg" viewBox="0 0 400 100" preserveAspectRatio="xMidYMax meet" fill="none">
+      <ellipse cx="60" cy="120" rx="55" ry="70" fill="#a5d6a7" opacity=".35"/>
+      <ellipse cx="200" cy="110" rx="70" ry="90" fill="#81c784" opacity=".3"/>
+      <ellipse cx="340" cy="125" rx="50" ry="65" fill="#a5d6a7" opacity=".35"/>
+    </svg>
+    <div style="position:relative;z-index:1">
+      <div style="font-size:11px;color:#388e3c;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">bem-vindos à floresta</div>
+      <h1 style="color:#1b5e20;font-size:22px" id="menu-title">—</h1>
+    </div>
+  </div>
+  <div class="scores">
+    <div class="score-card">
+      <div class="score-name" id="ms1">—</div>
+      <div class="score-num" id="mp1">0</div>
+    </div>
+    <div class="vs">vs</div>
+    <div class="score-card">
+      <div class="score-name" id="ms2">—</div>
+      <div class="score-num" id="mp2">0</div>
+    </div>
+  </div>
+  <div class="menu-btns">
+    <button class="btn-main" onclick="goTo('s-play');resetRound()">jogar 🎮</button>
+    <button class="btn-ghost" onclick="goTo('s-rules')">🌿 ver as regras da floresta</button>
+    <button class="btn-ghost" onclick="resetAll()">🔄 novo jogo</button>
+  </div>
+</div>
+
+<div id="s-rules" class="screen">
+  <span class="back" onclick="goTo('s-menu')">← voltar</span>
+  <div style="text-align:center">
+    <div style="font-size:28px;margin-bottom:6px">🌲</div>
+    <h2 style="font-size:20px;font-weight:500">regras da floresta</h2>
+    <p style="font-size:13px;color:var(--muted);margin-top:3px">os animais e seus poderes</p>
+  </div>
+  <div class="rules-list">
+    <div class="rule-row">
+      <div class="rule-animals">🐻 <span style="color:var(--border)">→</span> ✂️</div>
+      <span>o <strong style="color:var(--text)">urso (pedra)</strong> esmaga a tesoura</span>
+    </div>
+    <div class="rule-row">
+      <div class="rule-animals">🦊 <span style="color:var(--border)">→</span> 🐻</div>
+      <span>a <strong style="color:var(--text)">raposa (papel)</strong> envolve o urso</span>
+    </div>
+    <div class="rule-row">
+      <div class="rule-animals">✂️ <span style="color:var(--border)">→</span> 🦊</div>
+      <span>a <strong style="color:var(--text)">tesoura</strong> apara a raposa</span>
+    </div>
+    <div class="rule-row" style="border:none;padding-top:16px;flex-direction:column;align-items:flex-start;gap:8px">
+      <div style="font-size:12px;color:var(--muted);font-weight:500">como funciona</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">Cada jogador escolhe em segredo. O resultado aparece depois que os dois escolherem. Quem acumular mais pontos vence a partida!</div>
+    </div>
+  </div>
+</div>
+
+<div id="s-play" class="screen">
+  <span class="back" onclick="goTo('s-menu')">← voltar</span>
+  <div class="scores" style="max-width:400px">
+    <div class="score-card">
+      <div class="score-name" id="ps1">—</div>
+      <div class="score-num" id="pp1">0</div>
+    </div>
+    <div class="vs">vs</div>
+    <div class="score-card">
+      <div class="score-name" id="ps2">—</div>
+      <div class="score-num" id="pp2">0</div>
+    </div>
+  </div>
+  <div class="step-dots">
+    <div class="dot active" id="d1"></div>
+    <div class="dot" id="d2"></div>
+  </div>
+
+  <div id="turn1" class="player-section">
+    <div class="player-label">vez de <span class="player-name" id="tn1">—</span> 🦊</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="pick(1,'pedra')">
+        <div class="choice-animal">🐻</div>
+        <div class="choice-label">pedra</div>
+      </button>
+      <button class="choice-btn" onclick="pick(1,'papel')">
+        <div class="choice-animal">🦊</div>
+        <div class="choice-label">papel</div>
+      </button>
+      <button class="choice-btn" onclick="pick(1,'tesoura')">
+        <div class="choice-animal">🦝</div>
+        <div class="choice-label">tesoura</div>
+      </button>
+    </div>
+  </div>
+
+  <div id="turn2" class="player-section" style="display:none">
+    <div class="hidden-tag" id="p1done">— já escolheu em segredo 🤫</div>
+    <div class="player-label">vez de <span class="player-name" id="tn2">—</span> 🐻</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="pick(2,'pedra')">
+        <div class="choice-animal">🐻</div>
+        <div class="choice-label">pedra</div>
+      </button>
+      <button class="choice-btn" onclick="pick(2,'papel')">
+        <div class="choice-animal">🦊</div>
+        <div class="choice-label">papel</div>
+      </button>
+      <button class="choice-btn" onclick="pick(2,'tesoura')">
+        <div class="choice-animal">🦝</div>
+        <div class="choice-label">tesoura</div>
+      </button>
+    </div>
+  </div>
+
+  <div id="result-sec" style="display:none;width:100%;max-width:400px;flex-direction:column;gap:10px;align-items:center">
+    <div class="result-card">
+      <div class="result-row">
+        <div class="result-player">
+          <div class="result-animal" id="ra1">🐻</div>
+          <div class="result-pname" id="rn1">—</div>
+          <div class="result-move" id="rm1">—</div>
+        </div>
+        <div style="font-size:14px;color:var(--border);font-style:italic">vs</div>
+        <div class="result-player">
+          <div class="result-animal" id="ra2">🦊</div>
+          <div class="result-pname" id="rn2">—</div>
+          <div class="result-move" id="rm2">—</div>
+        </div>
+      </div>
+      <div class="result-divider">
+        <div class="result-winner" id="rw">—</div>
+        <div class="result-sub" id="rs">—</div>
+      </div>
+      <div class="result-btns">
+        <button class="btn-main" onclick="resetRound();goTo('s-play')" style="padding:10px 24px;font-size:14px">jogar de novo 🌿</button>
+        <button class="btn-ghost" onclick="goTo('s-menu')" style="font-size:14px">menu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ANIMALS={pedra:'🐻',papel:'🦊',tesoura:'🦝'};
+const WINS={pedra:'tesoura',papel:'pedra',tesoura:'papel'};
+const VERBS={pedra:'o urso esmaga a tesoura de',papel:'a raposa envolve o urso de',tesoura:'a tesoura apara a raposa de'};
+let g={n1:'',n2:'',s1:0,s2:0,m1:null,m2:null};
+
+function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+
+function startGame(){
+  const n1=document.getElementById('n1').value.trim();
+  const n2=document.getElementById('n2').value.trim();
+  if(!n1||!n2){
+    if(!n1)document.getElementById('n1').style.borderColor='#e57373';
+    if(!n2)document.getElementById('n2').style.borderColor='#e57373';
+    return;
+  }
+  g.n1=n1;g.n2=n2;g.s1=0;g.s2=0;
+  updateScores();
+  document.getElementById('menu-title').textContent=n1+' & '+n2;
+  goTo('s-menu');
+}
+
+function updateScores(){
+  ['ms1','ps1'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=g.n1});
+  ['ms2','ps2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=g.n2});
+  ['mp1','pp1'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=g.s1});
+  ['mp2','pp2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=g.s2});
+}
+
+function resetRound(){
+  g.m1=null;g.m2=null;
+  document.getElementById('result-sec').style.display='none';
+  document.getElementById('turn1').style.display='block';
+  document.getElementById('turn2').style.display='none';
+  document.getElementById('d1').classList.add('active');
+  document.getElementById('d2').classList.remove('active');
+  document.getElementById('tn1').textContent=g.n1;
+  document.getElementById('tn2').textContent=g.n2;
+  document.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected','disabled'));
+  updateScores();
+}
+
+function pick(player,move){
+  if(player===1){
+    g.m1=move;
+    document.getElementById('p1done').textContent=g.n1+' já escolheu em segredo 🤫';
+    document.getElementById('turn1').style.display='none';
+    document.getElementById('turn2').style.display='block';
+    document.getElementById('d1').classList.remove('active');
+    document.getElementById('d2').classList.add('active');
+  } else {
+    g.m2=move;
+    showResult();
+  }
+}
+
+function showResult(){
+  document.getElementById('turn2').style.display='none';
+  const rs=document.getElementById('result-sec');
+  rs.style.display='flex';
+  document.getElementById('ra1').textContent=ANIMALS[g.m1];
+  document.getElementById('ra2').textContent=ANIMALS[g.m2];
+  document.getElementById('rn1').textContent=g.n1;
+  document.getElementById('rn2').textContent=g.n2;
+  document.getElementById('rm1').textContent=g.m1;
+  document.getElementById('rm2').textContent=g.m2;
+  let winner,sub,won=false;
+  if(g.m1===g.m2){winner='🌿 empate!';sub='a floresta está em equilíbrio'}
+  else if(WINS[g.m1]===g.m2){
+    winner=g.n1+' ganhou! '+ANIMALS[g.m1];
+    sub=VERBS[g.m1]+' '+g.n2;
+    g.s1++;won=true;
+  } else {
+    winner=g.n2+' ganhou! '+ANIMALS[g.m2];
+    sub=VERBS[g.m2]+' '+g.n1;
+    g.s2++;won=true;
+  }
+  document.getElementById('rw').textContent=winner;
+  document.getElementById('rs').textContent=sub;
+  updateScores();
+  if(won)celebrate();
+}
+
+function celebrate(){
+  const c=document.getElementById('confetti');
+  c.style.display='block';
+  c.innerHTML='';
+  const items=['🍃','🌿','🍀','🌱','✨','🦋'];
+  for(let i=0;i<18;i++){
+    const el=document.createElement('div');
+    el.className='leaf';
+    el.style.left=Math.random()*100+'%';
+    el.style.animationDuration=(1.5+Math.random()*2)+'s';
+    el.style.animationDelay=(Math.random()*.8)+'s';
+    el.style.fontSize=(16+Math.random()*16)+'px';
+    el.textContent=items[Math.floor(Math.random()*items.length)];
+    c.appendChild(el);
+  }
+  setTimeout(()=>{c.style.display='none';c.innerHTML=''},3500);
+}
+
+function resetAll(){
+  g={n1:'',n2:'',s1:0,s2:0,m1:null,m2:null};
+  document.getElementById('n1').value='';
+  document.getElementById('n2').value='';
+  ['n1','n2'].forEach(id=>document.getElementById(id).style.borderColor='');
+  goTo('s-names');
+}
+
+document.getElementById('n1').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('n2').focus()});
+document.getElementById('n2').addEventListener('keydown',e=>{if(e.key==='Enter')startGame()});
+</script>
